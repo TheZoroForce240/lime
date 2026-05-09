@@ -10,6 +10,13 @@
 #undef CreateWindow
 #endif
 
+#ifdef LIME_IMGUI
+#include "imgui.h"
+#include "imgui_internal.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
+#endif
+
 
 namespace lime {
 
@@ -145,6 +152,9 @@ namespace lime {
 
 			}
 
+			#ifdef LIME_IMGUI
+			SDL_SetHint (SDL_HINT_IME_SHOW_UI, "1");
+			#endif
 		}
 
 		sdlWindow = SDL_CreateWindow (title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, sdlWindowFlags);
@@ -262,6 +272,19 @@ namespace lime {
 
 				#endif
 
+				#ifdef LIME_IMGUI
+				IMGUI_CHECKVERSION();
+				ImGui::CreateContext();
+				ImGuiIO& io = ImGui::GetIO();
+				io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+				io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+				io.ConfigErrorRecoveryEnableAssert = false;
+
+				// Setup Platform/Renderer backends
+				ImGui_ImplSDL2_InitForOpenGL(sdlWindow, context);
+				ImGui_ImplOpenGL3_Init();
+				#endif
+
 			} else {
 
 				SDL_GL_DeleteContext (context);
@@ -296,6 +319,12 @@ namespace lime {
 
 
 	SDLWindow::~SDLWindow () {
+
+		#if LIME_IMGUI
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplSDL2_Shutdown();
+		ImGui::DestroyContext();
+		#endif
 
 		if (sdlWindow) {
 
@@ -380,6 +409,13 @@ namespace lime {
 	void SDLWindow::ContextFlip () {
 
 		if (context && !sdlRenderer) {
+
+			#ifdef LIME_IMGUI
+			if (ImGui::GetCurrentContext()->WithinFrameScope) {
+				ImGui::Render();
+				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			}
+			#endif
 
 			SDL_GL_SwapWindow (sdlWindow);
 

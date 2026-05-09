@@ -11,6 +11,11 @@
 #include "emscripten.h"
 #endif
 
+#ifdef LIME_IMGUI
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
+#endif
 
 namespace lime {
 
@@ -231,9 +236,30 @@ namespace lime {
 						nextUpdate += NextFrameStep(framePeriod);
 					}
 
+
+					#ifdef LIME_IMGUI
+					ImGui_ImplOpenGL3_NewFrame();
+					ImGui_ImplSDL2_NewFrame();
+					ImGui::NewFrame();
+					#endif
+
 					ApplicationEvent::Dispatch (&applicationEvent);
 					RenderEvent::Dispatch (&renderEvent);
 
+					#ifdef LIME_IMGUI
+					ImGui::Render();
+
+					//#ifdef HX_WINDOWS
+					ImGuiIO& io = ImGui::GetIO(); (void)io;
+					if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+						SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+						SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+						ImGui::UpdatePlatformWindows();
+						ImGui::RenderPlatformWindowsDefault();
+						SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+					}
+					//#endif
+					#endif
 				}
 
 				break;
@@ -384,8 +410,28 @@ namespace lime {
 
 						if (!inBackground) {
 
+							#ifdef LIME_IMGUI
+							ImGui_ImplOpenGL3_NewFrame();
+							ImGui_ImplSDL2_NewFrame();
+							ImGui::NewFrame();
+							#endif
+
 							RenderEvent::Dispatch (&renderEvent);
 
+							#ifdef LIME_IMGUI
+							ImGui::Render();
+
+							//#ifdef HX_WINDOWS
+							ImGuiIO& io = ImGui::GetIO(); (void)io;
+							if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+								SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+								SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+								ImGui::UpdatePlatformWindows();
+								ImGui::RenderPlatformWindowsDefault();
+								SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+							}
+							//#endif
+							#endif
 						}
 
 						break;
@@ -396,7 +442,28 @@ namespace lime {
 
 						if (!inBackground) {
 
+							#ifdef LIME_IMGUI
+							ImGui_ImplOpenGL3_NewFrame();
+							ImGui_ImplSDL2_NewFrame();
+							ImGui::NewFrame();
+							#endif
+
 							RenderEvent::Dispatch (&renderEvent);
+
+							#ifdef LIME_IMGUI
+							ImGui::Render();
+
+							//#ifdef HX_WINDOWS
+							ImGuiIO& io = ImGui::GetIO(); (void)io;
+							if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+								SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+								SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+								ImGui::UpdatePlatformWindows();
+								ImGui::RenderPlatformWindowsDefault();
+								SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+							}
+							//#endif
+							#endif
 
 						}
 
@@ -657,6 +724,13 @@ namespace lime {
 
 	void SDLApplication::ProcessKeyEvent (SDL_Event* event) {
 
+		#ifdef LIME_IMGUI
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		if (io.WantCaptureKeyboard) {
+			return;
+		}
+		#endif
+
 		if (KeyEvent::callback) {
 
 			switch (event->type) {
@@ -694,6 +768,13 @@ namespace lime {
 
 
 	void SDLApplication::ProcessMouseEvent (SDL_Event* event) {
+
+		#ifdef LIME_IMGUI
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		if (io.WantCaptureMouse) {
+			return;
+		}
+		#endif
 
 		if (MouseEvent::callback) {
 
@@ -971,6 +1052,10 @@ namespace lime {
 
 			firstTime = false;
 
+			#ifdef LIME_IMGUI
+			ImGui_ImplSDL2_ProcessEvent(&event);
+			#endif
+
 			HandleEvent (&event);
 			event.type = -1;
 			if (!active)
@@ -979,6 +1064,10 @@ namespace lime {
 		#endif
 
 			while (SDL_PollEvent (&event)) {
+
+				#ifdef LIME_IMGUI
+				ImGui_ImplSDL2_ProcessEvent(&event);
+				#endif
 
 				HandleEvent (&event);
 				event.type = -1;

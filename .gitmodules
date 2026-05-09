@@ -82,3 +82,7 @@
 	path = project/lib/hashlink
 	url = https://github.com/HaxeFoundation/hashlink
 	shallow = true
+[submodule "project/lib/imgui"]
+	path = project/lib/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking

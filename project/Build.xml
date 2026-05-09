@@ -52,6 +52,8 @@
 	<set name="NATIVE_TOOLKIT_SDL_STATIC" value="1" />
 	<set name="NATIVE_TOOLKIT_SDL_ANGLE" value="1" if="LIME_SDL_ANGLE" />
 
+	<set name="LIME_IMGUI" value="1" if="LIME_SDL" />
+
 	<files id="lime">
 
 		<!-- setting HXCPP_CPP11 doesn't seem to apply to .mm files -->
@@ -300,6 +302,16 @@
 
 		</section>
 
+		<section if="LIME_IMGUI">
+
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/imgui/" />
+			<compilerflag value="-I${NATIVE_TOOLKIT_PATH}/imgui/backends/" />
+			<compilerflag value="-DLIME_IMGUI" />
+
+			<file name="src/tools/imgui/ImGuiBindings.cpp" />
+
+		</section>
+
 		<file name="src/app/ApplicationEvent.cpp" />
 		<file name="src/graphics/Image.cpp" />
 		<file name="src/graphics/ImageBuffer.cpp" />
@@ -372,6 +384,7 @@
 	<include name="lib/vpx-files.xml" />
 	<include name="lib/webm-files.xml" />
 	<include name="lib/zlib-files.xml" />
+	<include name="lib/imgui-files.xml" />
 
 	<set name="DEBUGEXTRA" value="-debug" if="fulldebug" />
 	<set name="LIBSUFFIX" value="${HX_TARGET_SUFFIX}" if="HX_TARGET_SUFFIX" />
@@ -405,6 +418,7 @@
 		<files id="native-toolkit-vpx" if="LIME_VPX" />
 		<files id="native-toolkit-webm" if="LIME_WEBM" />
 		<files id="native-toolkit-zlib" if="LIME_ZLIB" />
+		<files id="native-toolkit-imgui" if="LIME_IMGUI" />
 
 		<section unless="static_link">
 

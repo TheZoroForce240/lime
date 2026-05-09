@@ -26,6 +26,7 @@
 	<define name="lime-opengles" if="emscripten || mobile" />
 	<define name="lime-vorbis" if="native" />
 	<define name="lime-webgl" if="html5" />
+	<define name="lime-imgui" if="desktop" unless="html5"/>
 
 	<define name="no-typedarray-inline" if="cs" />
 	<haxedef name="no-compilation" />
